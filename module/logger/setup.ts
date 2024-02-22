@@ -1,21 +1,21 @@
 import { Logger } from './logger';
 
 interface LoggingConfig {
-    withFilter(filterFunc: (log: any) => boolean): void
-    withFormatter(format: string): void
-    withLevel(level: string): void
+    withRedaction(redactions: string[]): void;
+    withFormatter(format: string): void;
+    withLevel(level: string): void;
+    init(): Logger;
 }
 
-
-export class CreateLogging implements LoggingConfig {
+export class InitLogging implements LoggingConfig {
     private logging: Logger;
 
     constructor() {
         this.logging = new Logger();
     }
 
-    public withFilter(filterFunc: (log: any) => boolean): void {
-        this.logging.filter = filterFunc;
+    public withRedaction(redactions: string[]): void {
+        this.logging.redactions = redactions;
     }
 
     public withFormatter(format: string): void {
@@ -26,10 +26,8 @@ export class CreateLogging implements LoggingConfig {
         this.logging.level = level;
     }
 
-    public run() {
-        return this.logging.pinoLogger;
+    public init(): Logger {
+        this.logging.pinoLogger;
+        return this.logging;
     }
-
 }
-
-

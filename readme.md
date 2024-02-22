@@ -19,6 +19,10 @@ npx tsc
 ```
  node ./dist/index.js
 ```
+3. compile & running
+```
+npm run start
+```
 
 ## Usage
 

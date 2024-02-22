@@ -1,26 +1,33 @@
-import {CreateLogging} from './logger/setup';
+import {InitLogging} from './logger/setup';
 
-const logging = new CreateLogging();
-logging.withFilter(null);
+// configure
+const logging = new InitLogging()
+logging.withRedaction(['password', 'token']);
 logging.withFormatter('');
 logging.withLevel('info');
 
-const debug = logging.run(); // masuk sini [ 'info', 'error' ] json error
+// init
+const log = logging.init();
 
-debug.info({
-    msg: {
-        "test": "test"
-    },
-    request: {
-        hello: 'world'
-    }
-});
-debug.debug('this is info');
-debug.fatal('this is info');
-debug.trace('this is info');
-debug.warn('this is info');
-debug.error('this is info');
+const sampleData = {
+    employees: [{
+            name: 'messi',
+            email: 'messi@moladin.com',
+            password: 'rahasia',
+            token: 'secret'
+        },
+        {
+            name: 'ronaldo',
+            email: 'ronaldo@moladin.com',
+            password: 'rahasia',
+            token: 'secret'
+        }
+    ]
+}
 
-// 1. filter message PIC + abstraksi @yusuf
-// 2. middleware PIC @Kevin
-// f
+log.info('3548292a-ec74-4464-b46c-211f881068b9', 'this is info', sampleData)
+log.debug('3548292a-ec74-4464-b46c-211f881068b9', 'this is debug', sampleData)
+log.trace('3548292a-ec74-4464-b46c-211f881068b9', 'this is trace', sampleData)
+log.warn('3548292a-ec74-4464-b46c-211f881068b9', 'this is warn', sampleData)
+log.error('3548292a-ec74-4464-b46c-211f881068b9', 'this is error', null, new Error('something went wrong!'))
+log.fatal('3548292a-ec74-4464-b46c-211f881068b9', 'this is fatal', null, new Error('panic!'))
