@@ -1,7 +1,7 @@
 import { Logger } from './logger';
 
 interface LoggingConfig {
-    withFilter(filters: string[]): void
+    withFilter(filterFunc: (log: any) => boolean): void
     withFormatter(format: string): void
     withLevel(level: string): void
 }
@@ -14,8 +14,8 @@ export class CreateLogging implements LoggingConfig {
         this.logging = new Logger();
     }
 
-    public withFilter(filters: string[]): void {
-        this.logging.filter = filters;
+    public withFilter(filterFunc: (log: any) => boolean): void {
+        this.logging.filter = filterFunc;
     }
 
     public withFormatter(format: string): void {

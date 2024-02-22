@@ -1,16 +1,24 @@
 import {pino} from 'pino';
 
 export class Logger {
-    public filter: string[] = [];
+    public filter: (log: any) => boolean;
     public format: string = '';
     public level: string = 'info';
 
     private logger: any;
 
-    constructor() {
-        this.logger = pino({
+    private setup() {
+        let config: any = {
             level: this.level,
-        });
+        }
+
+        if (this.format) {
+            config.transport = {
+                target: this.format,
+            }
+        }
+
+        this.logger = pino(config);
     }
 
     // filter pino
@@ -18,6 +26,7 @@ export class Logger {
     // format pino
 
     get pinoLogger() {
+        this.setup();
         return this.logger;
     }
 }
