@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pino": "^8.19.0"
+    "pino": "^8.19.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "pino-pretty": "^10.3.1",

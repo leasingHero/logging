@@ -1,31 +1,18 @@
 import { pino } from 'pino';
+import { v4 as uuidv4 } from 'uuid';
 import generateRedactions from './utils';
 
 interface ILogger {
-    info(traceId: string, msg: string, data?: any): void;
-    debug(traceId: string, msg: string, data?: any): void;
-    trace(traceId: string, msg: string, data?: any): void;
-    warn(traceId: string, msg: string, data?: any): void;
-    error(traceId: string, msg: string, data?: any, error?: Error): void;
-    fatal(traceId: string, msg: string, data?: any, error?: Error): void;
-}
-
-interface LoggerConfig {
-    level: string;
-    timestamp: () => string;
-    formatters: {
-        level: (label: string) => { level: string };
-    };
-    transport?: {
-        target: string;
-    };
-    redact?: {
-        paths: string[];
-        censor: string;
-    };
+    info(msg: string, data?: any): void;
+    debug(msg: string, data?: any): void;
+    trace(msg: string, data?: any): void;
+    warn(msg: string, data?: any): void;
+    error(msg: string, data?: any, error?: Error): void;
+    fatal(msg: string, data?: any, error?: Error): void;
 }
 
 export class Logger implements ILogger {
+    private traceId: string;
     public redactions: string[] = [];
     public format: string = '';
     public level: string = 'info';
@@ -33,7 +20,7 @@ export class Logger implements ILogger {
     private logger: pino.Logger;
 
     private setup() {
-        const config: LoggerConfig = {
+        const config: pino.LoggerOptions = {
             level: this.level,
             timestamp: pino.stdTimeFunctions.isoTime,
             formatters: {
@@ -57,48 +44,46 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    public info(traceId: string, msg: string, data?: any) {
-        this.logger.info({ traceId, msg, data });
+    // TODO: make it corrleated with middleware?
+    private getTraceId() {
+        return this.traceId || (this.traceId = uuidv4());
+    }
+    
+    private setTraceId(traceId: string) {
+        this.traceId = traceId;
     }
 
-    public debug(traceId: string, msg: string, data?: any) {
-        this.logger.debug({ traceId, msg, data });
-    }
-
-    public trace(traceId: string, msg: string, data?: any) {
-        this.logger.trace({ traceId, msg, data });
-    }
-
-    public warn(traceId: string, msg: string, data?: any) {
-        this.logger.warn({ traceId, msg, data });
-    }
-
-    public error(traceId: string, msg: string, data?: any, error?: Error) {
-        this.logger.error({
-            traceId,
+    private log(level: string, msg: string, data?: any, error?: Error) {
+        this.logger[level]({
+            traceId: this.getTraceId(),
             msg,
             data,
-            error: error
-                ? {
-                      msg: error.message,
-                      stack: error.stack,
-                  }
-                : undefined,
+            error: error ? { msg: error.message, stack: error.stack } : undefined,
         });
     }
 
-    public fatal(traceId: string, msg: string, data?: any, error?: Error) {
-        this.logger.fatal({
-            traceId,
-            msg,
-            data,
-            error: error
-                ? {
-                      msg: error.message,
-                      stack: error.stack,
-                  }
-                : undefined,
-        });
+    public info(msg: string, data?: any) {
+        this.log('info', msg, data);
+    }
+
+    public debug(msg: string, data?: any) {
+        this.log('debug', msg, data);
+    }
+
+    public trace(msg: string, data?: any) {
+        this.log('trace', msg, data);
+    }
+
+    public warn(msg: string, data?: any) {
+        this.log('warn', msg, data);
+    }
+
+    public error(msg: string, data?: any, error?: Error) {
+        this.log('error', msg, data, error);
+    }
+
+    public fatal(msg: string, data?: any, error?: Error) {
+        this.log('fatal', msg, data, error);
     }
 
     get pinoLogger() {

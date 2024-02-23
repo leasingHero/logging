@@ -22,12 +22,12 @@ const sampleData = {
             password: 'rahasia',
             token: 'secret'
         }
-    ]
+    ] 
 }
 
-log.info('3548292a-ec74-4464-b46c-211f881068b9', 'this is info', sampleData)
-log.debug('3548292a-ec74-4464-b46c-211f881068b9', 'this is debug', sampleData)
-log.trace('3548292a-ec74-4464-b46c-211f881068b9', 'this is trace', sampleData)
-log.warn('3548292a-ec74-4464-b46c-211f881068b9', 'this is warn', sampleData)
-log.error('3548292a-ec74-4464-b46c-211f881068b9', 'this is error', null, new Error('something went wrong!'))
-log.fatal('3548292a-ec74-4464-b46c-211f881068b9', 'this is fatal', null, new Error('panic!'))
+log.info('this is info', sampleData)
+log.debug('this is debug', sampleData)
+log.trace('this is trace', sampleData)
+log.warn('this is warn', sampleData)
+log.error('this is error', null, new Error('something went wrong!'))
+log.fatal('this is fatal', null, new Error('panic!'))
