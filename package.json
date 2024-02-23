@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx tsc && node dist/index.js"
+    "start": "npx tsc && node dist/index.js",
+    "example-log": "npx tsc && node dist/examples/log.js",
+    "format": "prettier --write \"**/*.ts\""
   },
   "author": "",
   "license": "ISC",
@@ -14,9 +16,14 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/uuid": "^9.0.8",
     "pino-pretty": "^10.3.1",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4
   }
 }

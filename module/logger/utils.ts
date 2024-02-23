@@ -1,4 +1,7 @@
-function generateRedactions(inputs: string[], maxNestingLevel: number = 5): string[] {
+function generateRedactions(
+    inputs: string[],
+    maxNestingLevel: number = 5,
+): string[] {
     const patterns: string[] = [];
 
     for (const input of inputs) {

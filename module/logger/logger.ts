@@ -37,20 +37,19 @@ export class Logger implements ILogger {
         if (this.redactions.length > 0) {
             config.redact = {
                 paths: generateRedactions(this.redactions),
-                censor: '[*********]'
+                censor: '[*********]',
             };
         }
 
         this.logger = pino(config);
     }
 
-    // TODO: make it corrleated with middleware?
+    public setTraceId(traceId: string) {
+        this.traceId = traceId;
+    }
+
     private getTraceId() {
         return this.traceId || (this.traceId = uuidv4());
-    }
-    
-    private setTraceId(traceId: string) {
-        this.traceId = traceId;
     }
 
     private log(level: string, msg: string, data?: any, error?: Error) {
@@ -58,7 +57,9 @@ export class Logger implements ILogger {
             traceId: this.getTraceId(),
             msg,
             data,
-            error: error ? { msg: error.message, stack: error.stack } : undefined,
+            error: error
+                ? { msg: error.message, stack: error.stack }
+                : undefined,
         });
     }
 

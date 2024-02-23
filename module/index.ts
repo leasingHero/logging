@@ -1,33 +1,25 @@
-import {InitLogging} from './logger/setup';
+import { InitLogging } from './logger/setup';
 
-// configure
-const logging = new InitLogging()
-logging.withRedaction(['password', 'token']);
-logging.withFormatter('');
-logging.withLevel('info');
+const log = new InitLogging()
+    .withRedaction(['password', 'token'])
+    .withFormatter('pino-pretty')
+    .withLevel('info')
+    .initialize();
 
-// init
-const log = logging.init();
-
-const sampleData = {
-    employees: [{
+const data = {
+    employees: [
+        {
             name: 'messi',
             email: 'messi@moladin.com',
-            password: 'rahasia',
-            token: 'secret'
+            password: 'realmadrid',
+            token: 'secret',
         },
-        {
-            name: 'ronaldo',
-            email: 'ronaldo@moladin.com',
-            password: 'rahasia',
-            token: 'secret'
-        }
-    ] 
-}
+    ],
+};
 
-log.info('this is info', sampleData)
-log.debug('this is debug', sampleData)
-log.trace('this is trace', sampleData)
-log.warn('this is warn', sampleData)
-log.error('this is error', null, new Error('something went wrong!'))
-log.fatal('this is fatal', null, new Error('panic!'))
+log.info('This is an informational message', data);
+log.debug('This is a debugging message', data);
+log.trace('This is a trace message', data);
+log.warn('This is a warning message', data);
+log.error('This is an error message', null, new Error('Something went wrong!'));
+log.fatal('This is a fatal message', null, new Error('Panic!'));

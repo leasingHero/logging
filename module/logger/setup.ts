@@ -1,10 +1,10 @@
 import { Logger } from './logger';
 
 interface LoggingConfig {
-    withRedaction(redactions: string[]): void;
-    withFormatter(format: string): void;
-    withLevel(level: string): void;
-    init(): Logger;
+    withRedaction(redactions: string[]): LoggingConfig;
+    withFormatter(format: string): LoggingConfig;
+    withLevel(level: string): LoggingConfig;
+    initialize(): Logger;
 }
 
 export class InitLogging implements LoggingConfig {
@@ -14,19 +14,22 @@ export class InitLogging implements LoggingConfig {
         this.logging = new Logger();
     }
 
-    public withRedaction(redactions: string[]): void {
+    public withRedaction(redactions: string[]): LoggingConfig {
         this.logging.redactions = redactions;
+        return this;
     }
 
-    public withFormatter(format: string): void {
+    public withFormatter(format: string): LoggingConfig {
         this.logging.format = format;
+        return this;
     }
 
-    public withLevel(level: string): void {
+    public withLevel(level: string): LoggingConfig {
         this.logging.level = level;
+        return this;
     }
 
-    public init(): Logger {
+    public initialize(): Logger {
         this.logging.pinoLogger;
         return this.logging;
     }
