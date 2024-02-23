@@ -24,3 +24,22 @@ debug.error('this is info');
 // 1. filter message PIC + abstraksi @yusuf
 // 2. middleware PIC @Kevin
 // f
+
+
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.post('/tes/:id', (req, res, next) => {
+    logging.httpMiddleware(req, res, next);
+    res.send({
+        message: 'Hello World!'
+    });
+});
+
+app.listen(port, () => {
+    console.log(`App listening at http://localhost:${port}`);
+});
