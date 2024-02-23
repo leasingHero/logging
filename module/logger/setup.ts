@@ -1,9 +1,12 @@
 import { Logger } from './logger';
+import { httpMiddleware as middleware } from './middleware';
+import { Request, Response, NextFunction } from 'express';
 
 interface LoggingConfig {
     withFilter(filterFunc: (log: any) => boolean): void
     withFormatter(format: string): void
     withLevel(level: string): void
+    httpMiddleware(req: Request, res: Response, next: NextFunction): void
 }
 
 
@@ -28,6 +31,10 @@ export class CreateLogging implements LoggingConfig {
 
     public run() {
         return this.logging.pinoLogger;
+    }
+
+    public httpMiddleware(req: Request, res: Response, next: NextFunction): void {
+        return middleware(req, res, next, this.logging.pinoLogger);
     }
 
 }

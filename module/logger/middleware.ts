@@ -1,9 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { CreateLogging } from './setup';
-
-const logging = new CreateLogging();
-logging.withFormatter('pino-pretty');
 
 const getRequestLog = (req: Request) => {
     return JSON.stringify({
@@ -18,8 +13,7 @@ const getRequestLog = (req: Request) => {
     });
 };
 
-const getResponseLog = (res: Response) => {
-    const logger = logging.run();
+const getResponseLog = (res: Response, logger: any) => {
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
@@ -80,53 +74,8 @@ const getResponseLog = (res: Response) => {
     return res;
 };
 
-@Injectable()
-export class MyNestMiddleware implements NestMiddleware {
-    private logging: CreateLogging;
-
-    constructor() {
-        this.logging = new CreateLogging();
-    }
-
-    use(request: Request, response: Response, next: NextFunction): void {
-        const logger = this.logging.run();
-
-        // get request logs
-        const requestLog = getRequestLog(request);
-        logger.debug(JSON.stringify(requestLog));
-
-        // get response logs
-        getResponseLog(response);
-
-        next();
-    }
-}
-
-
-// BELOW IS EXAMPLE TO USE MyNestMiddleware MIDDLEWARE IN NEST JS
-// import { MyNestMiddleware } from './myMiddleware';
-
-// @Module({
-//   // ...
-// })
-// export class AppModule implements NestModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer
-//       .apply(MyNestMiddleware)
-//       .forRoutes('*');
-//   }
-// }
-
-export function myExpressMiddleware(req: Request, res: Response, next: NextFunction) {
-    const logger = logging.run();
+export function httpMiddleware(req: Request, res: Response, next: NextFunction, logger: any) {
     logger.info(getRequestLog(req));
-    getResponseLog(res);
+    getResponseLog(res, logger);
     next();
 }
-
-// BELOW IS EXAMPLE TO USE myExpressMiddleware MIDDLEWARE IN EXPRESS
-// const express = require('express');
-// const { myExpressMiddleware } = require('./myMiddleware');
-
-// const app = express();
-// app.use(myExpressMiddleware);
