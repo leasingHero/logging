@@ -1,35 +1,36 @@
 import { Logger } from './logger';
 
 interface LoggingConfig {
-    withFilter(filterFunc: (log: any) => boolean): void
-    withFormatter(format: string): void
-    withLevel(level: string): void
+    withRedaction(redactions: string[]): LoggingConfig;
+    withFormatter(format: string): LoggingConfig;
+    withLevel(level: string): LoggingConfig;
+    initialize(): Logger;
 }
 
-
-export class CreateLogging implements LoggingConfig {
+export class InitLogging implements LoggingConfig {
     private logging: Logger;
 
     constructor() {
         this.logging = new Logger();
     }
 
-    public withFilter(filterFunc: (log: any) => boolean): void {
-        this.logging.filter = filterFunc;
+    public withRedaction(redactions: string[]): LoggingConfig {
+        this.logging.redactions = redactions;
+        return this;
     }
 
-    public withFormatter(format: string): void {
+    public withFormatter(format: string): LoggingConfig {
         this.logging.format = format;
+        return this;
     }
 
-    public withLevel(level: string): void {
+    public withLevel(level: string): LoggingConfig {
         this.logging.level = level;
+        return this;
     }
 
-    public run() {
-        return this.logging.pinoLogger;
+    public initialize(): Logger {
+        this.logging.pinoLogger;
+        return this.logging;
     }
-
 }
-
-
