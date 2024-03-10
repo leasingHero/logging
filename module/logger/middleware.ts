@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 const getRequestLog = (req: Request) => {
-    return JSON.stringify({
+    return {
         request: {
             method: req.method,
             url: req.originalUrl,
@@ -10,7 +10,7 @@ const getRequestLog = (req: Request) => {
             headers: req.headers,
             ip: req.ip,
         },
-    });
+    };
 };
 
 const getResponseLog = (res: Response, logger: any) => {
@@ -63,7 +63,7 @@ const getResponseLog = (res: Response, logger: any) => {
             },
         };
 
-        logger.info(JSON.stringify(responseLog));
+        logger.info(responseLog);
         // res.end() is satisfied after passing in restArgs as params
         // Doing so creates 'end' event to indicate that the entire body has been received.
         // Otherwise, the stream will continue forever (ref: https://nodejs.org/api/stream.html#event-end_1)

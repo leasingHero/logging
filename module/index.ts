@@ -1,29 +1,29 @@
-import {CreateLogging} from './logger/setup';
+import { InitLogging } from './logger/setup';
 
-const logging = new CreateLogging();
-logging.withFilter(null);
-logging.withFormatter('');
-logging.withLevel('info');
+const loggingConfig = new InitLogging()
+    .withRedaction(['password', 'token'])
+    .withFormatter('pino-pretty')
+    .withLevel('info');
 
-const debug = logging.run(); // masuk sini [ 'info', 'error' ] json error
+const log = loggingConfig.initialize();
 
-debug.info({
-    msg: {
-        "test": "test"
-    },
-    request: {
-        hello: 'world'
-    }
-});
-debug.debug('this is info');
-debug.fatal('this is info');
-debug.trace('this is info');
-debug.warn('this is info');
-debug.error('this is info');
+// const data = {
+//     employees: [
+//         {
+//             name: 'messi',
+//             email: 'messi@moladin.com',
+//             password: 'realmadrid',
+//             token: 'secret',
+//         },
+//     ],
+// };
 
-// 1. filter message PIC + abstraksi @yusuf
-// 2. middleware PIC @Kevin
-// f
+// log.info('This is an informational message', data);
+// log.debug('This is a debugging message', data);
+// log.trace('This is a trace message', data);
+// log.warn('This is a warning message', data);
+// log.error('This is an error message', null, new Error('Something went wrong!'));
+// log.fatal('This is a fatal message', null, new Error('Panic!'));
 
 
 const express = require('express');
@@ -34,7 +34,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.post('/tes/:id', (req, res, next) => {
-    logging.httpMiddleware(req, res, next);
+    log.info('log info pertama 1');
+    loggingConfig.httpMiddleware(req, res, next);
+    log.info('log info kedua 2');
     res.send({
         message: 'Hello World!'
     });
