@@ -26,7 +26,9 @@ npm run start
 
 ## Usage
 
-Instructions on how to use the project and any relevant examples.
+```
+npm install github:leasingHero/logging
+```
 
 ## Contributing
 
