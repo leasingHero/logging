@@ -1,5 +1,4 @@
-// Import logging initialization from logger setup
-import { InitLogging } from '../module/logger/setup';
+import {InitLogging} from '../module/index'
 
 // Initialize and configure logging
 const log = new InitLogging()

@@ -1,0 +1,1 @@
+export { InitLogging } from './setup';

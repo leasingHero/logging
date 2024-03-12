@@ -1,5 +1,6 @@
 import { pino } from 'pino';
 import { v4 as uuidv4 } from 'uuid';
+
 import generateRedactions from './utils';
 
 interface ILogger {
@@ -11,13 +12,14 @@ interface ILogger {
     fatal(msg: string, data?: any, error?: Error): void;
 }
 
+type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
-    private traceId: string;
-    public redactions: string[] = [];
-    public format: string = '';
-    public level: string = 'info';
+    private logger!: pino.Logger;
 
-    private logger: pino.Logger;
+    private traceId!: string;
+    public redactions: string[] = [];
+    public format = '';
+    public level = 'info';
 
     private setup() {
         const config: pino.LoggerOptions = {
@@ -52,7 +54,7 @@ export class Logger implements ILogger {
         return this.traceId || (this.traceId = uuidv4());
     }
 
-    private log(level: string, msg: string, data?: any, error?: Error) {
+    private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
             traceId: this.getTraceId(),
             msg,
