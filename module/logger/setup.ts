@@ -1,6 +1,6 @@
 import { Logger } from './logger';
 import { httpMiddleware as middleware } from './middleware';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { CorrelationIdLog } from './correlation';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -9,7 +9,7 @@ interface LoggingConfig {
     withFormatter(format: string): LoggingConfig;
     withLevel(level: string): LoggingConfig;
     initialize(): Logger;
-    httpMiddleware(req: Request, res: Response, next: NextFunction): void;
+    httpMiddleware(req: Request, res: Response): void;
 }
 
 export class InitLogging implements LoggingConfig {
@@ -41,8 +41,8 @@ export class InitLogging implements LoggingConfig {
         return this.logging;
     }
 
-    public httpMiddleware(req: Request, res: Response, next: NextFunction): void {
+    public httpMiddleware(req: Request, res: Response): void {
         this.correlationIdLog.set('correlation-id', uuidv4());
-        return middleware(req, res, next, this.logging.pinoLogger);
+        return middleware(req, res, this.logging.pinoLogger);
     }
 }
