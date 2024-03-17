@@ -43,6 +43,6 @@ export class InitLogging implements LoggingConfig {
 
     public httpMiddleware(req: Request, res: Response, next: NextFunction): void {
         this.correlationIdLog.set('correlation-id', uuidv4());
-        return middleware(req, res, next, this.logging);
+        return middleware(req, res, next, this.logging.pinoLogger);
     }
 }
