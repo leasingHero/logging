@@ -74,8 +74,7 @@ const getResponseLog = (res: Response, logger: any) => {
     return res;
 };
 
-export function httpMiddleware(req: Request, res: Response, next: NextFunction, logger: any) {
+export function httpMiddleware(req: Request, res: Response, logger: any) {
     logger.info(getRequestLog(req));
     getResponseLog(res, logger);
-    next();
 }
