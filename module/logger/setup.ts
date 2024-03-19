@@ -1,5 +1,6 @@
 import { Logger } from './logger';
 
+
 interface LoggingConfig {
     withRedaction(redactions: string[]): LoggingConfig;
     withFormatter(format: string): LoggingConfig;
@@ -9,6 +10,10 @@ interface LoggingConfig {
 
 export class InitLogging implements LoggingConfig {
     private logging: Logger;
+
+    constructor() {
+        this.logging = new Logger();
+    }
 
     public withRedaction(redactions: string[]): LoggingConfig {
         this.logging.redactions = redactions;
