@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 
-const getRequestLog = (req: Request) => {
+const getRequestLog = (req: Request, uuid: string) => {
     return {
+        correlationId: uuid,
         request: {
             method: req.method,
             url: req.originalUrl,
@@ -13,7 +14,7 @@ const getRequestLog = (req: Request) => {
     };
 };
 
-const getResponseLog = (res: Response, logger: any) => {
+const getResponseLog = (res: Response, logger: any, uuid: string) => {
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
@@ -50,12 +51,13 @@ const getResponseLog = (res: Response, logger: any) => {
         try {
             body = JSON?.parse(body);
         } catch (error) {
-            logger.warn(null, 'Warning: Response body is string!');
+            // logger.warn(null, 'Warning: Response body is string!');
         }
 
         // Set custom header for response
         res.setHeader('origin', 'restjs-req-res-logging-repo');
         const responseLog = {
+            correlationId: uuid,
             response: {
                 statusCode: res.statusCode,
                 body: body || {},
@@ -74,7 +76,7 @@ const getResponseLog = (res: Response, logger: any) => {
     return res;
 };
 
-export function httpMiddleware(req: Request, res: Response, logger: any) {
-    logger.info(getRequestLog(req));
-    getResponseLog(res, logger);
+export function httpMiddleware(req: Request, res: Response, logger: any, uuid: string) {
+    logger.info(getRequestLog(req, uuid));
+    getResponseLog(res, logger, uuid);
 }
