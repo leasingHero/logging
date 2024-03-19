@@ -17,7 +17,7 @@ const getResponseLog = (res: Response, logger: any) => {
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
-    
+
     res.write = (...chunks) => {
         const resArgs = [];
         for (let i = 0; i < chunks.length; i++) {
@@ -27,24 +27,24 @@ const getResponseLog = (res: Response, logger: any) => {
                 --i;
             }
         }
-        
+
         if (resArgs[0]) {
             chunkBuffers.push(Buffer.from(resArgs[0]));
         }
-        
+
         return rawResponse.apply(res, resArgs);
     };
-    
+
     res.end = (...chunk) => {
         const resArgs = [];
         for (let i = 0; i < chunk.length; i++) {
             resArgs[i] = chunk[i];
         }
-        
+
         if (resArgs[0]) {
             chunkBuffers.push(Buffer.from(resArgs[0]));
         }
-        
+
         let body = Buffer.concat(chunkBuffers).toString('utf8');
 
         try {

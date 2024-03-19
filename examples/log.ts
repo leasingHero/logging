@@ -1,4 +1,4 @@
-import {InitLogging} from '../module/index'
+import { InitLogging } from '../module/index';
 
 // Initialize and configure logging
 const log = new InitLogging()
