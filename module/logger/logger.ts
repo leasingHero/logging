@@ -2,6 +2,8 @@ import { pino } from 'pino';
 import { v4 as uuidv4 } from 'uuid';
 
 import generateRedactions from './utils';
+import { CorrelationIdLog } from './correlation';
+
 
 interface ILogger {
     info(msg: string, data?: any): void;
@@ -20,6 +22,8 @@ export class Logger implements ILogger {
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
+
+    constructor(private correlationIdLog: CorrelationIdLog) {}
 
     private setup() {
         const config: pino.LoggerOptions = {
@@ -57,6 +61,7 @@ export class Logger implements ILogger {
     private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
             traceId: this.getTraceId(),
+            correlationId: this.correlationIdLog.get('correlation-id'),
             msg,
             data,
             error: error

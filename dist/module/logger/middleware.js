@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-
-const getRequestLog = (req: Request) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.httpMiddleware = void 0;
+const getRequestLog = (req) => {
     return {
         request: {
             method: req.method,
@@ -12,12 +13,10 @@ const getRequestLog = (req: Request) => {
         },
     };
 };
-
-const getResponseLog = (res: Response, logger: any) => {
+const getResponseLog = (res, logger) => {
     const rawResponse = res.write;
     const rawResponseEnd = res.end;
     const chunkBuffers = [];
-    
     res.write = (...chunks) => {
         const resArgs = [];
         for (let i = 0; i < chunks.length; i++) {
@@ -27,33 +26,26 @@ const getResponseLog = (res: Response, logger: any) => {
                 --i;
             }
         }
-        
         if (resArgs[0]) {
             chunkBuffers.push(Buffer.from(resArgs[0]));
         }
-        
         return rawResponse.apply(res, resArgs);
     };
-    
     res.end = (...chunk) => {
         const resArgs = [];
         for (let i = 0; i < chunk.length; i++) {
             resArgs[i] = chunk[i];
         }
-        
         if (resArgs[0]) {
             chunkBuffers.push(Buffer.from(resArgs[0]));
         }
-        
         let body = Buffer.concat(chunkBuffers).toString('utf8');
-
         try {
             body = JSON?.parse(body);
-        } catch (error) {
+        }
+        catch (error) {
             logger.warn(null, 'Warning: Response body is string!');
         }
-
-        // Set custom header for response
         res.setHeader('origin', 'restjs-req-res-logging-repo');
         const responseLog = {
             response: {
@@ -62,19 +54,16 @@ const getResponseLog = (res: Response, logger: any) => {
                 headers: res.getHeaders(),
             },
         };
-
         logger.info(responseLog);
-        // res.end() is satisfied after passing in restArgs as params
-        // Doing so creates 'end' event to indicate that the entire body has been received.
-        // Otherwise, the stream will continue forever (ref: https://nodejs.org/api/stream.html#event-end_1)
         rawResponseEnd.apply(res, resArgs);
-        return responseLog as unknown as Response;
+        return responseLog;
     };
-
     return res;
 };
-
-export function httpMiddleware(req: Request, res: Response, logger: any) {
+function httpMiddleware(req, res, next, logger) {
     logger.info(getRequestLog(req));
     getResponseLog(res, logger);
+    next();
 }
+exports.httpMiddleware = httpMiddleware;
+//# sourceMappingURL=middleware.js.map
