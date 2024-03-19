@@ -18,12 +18,11 @@ interface ILogger {
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
     private logger!: pino.Logger;
-    private traceId!: string;
+    private correlationIdLog: CorrelationIdLog;
 
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
-    private correlationIdLog: CorrelationIdLog;
 
     constructor() {
         this.correlationIdLog = new CorrelationIdLog();
@@ -54,17 +53,8 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    public setTraceId(traceId: string) {
-        this.traceId = traceId;
-    }
-
-    private getTraceId() {
-        return this.traceId || (this.traceId = uuidv4());
-    }
-
     private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            traceId: this.getTraceId(),
             correlationId: this.correlationIdLog.get('correlation-id'),
             msg,
             data,
@@ -99,8 +89,9 @@ export class Logger implements ILogger {
     }
 
     public httpMiddleware(req: Request, res: Response): void {
-        this.correlationIdLog.set('correlation-id', uuidv4());
-        return middleware(req, res, this.logger);
+        const uuid = uuidv4();
+        this.correlationIdLog.set('correlation-id', uuid);
+        return middleware(req, res, this.logger, uuid);
     }
 
     get pinoLogger() {
