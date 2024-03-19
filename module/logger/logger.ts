@@ -1,9 +1,9 @@
 import { pino } from 'pino';
 import { v4 as uuidv4 } from 'uuid';
-
 import generateRedactions from './utils';
 import { CorrelationIdLog } from './correlation';
-
+import { httpMiddleware as middleware } from './middleware';
+import { Request, Response } from 'express';
 
 interface ILogger {
     info(msg: string, data?: any): void;
@@ -12,18 +12,22 @@ interface ILogger {
     warn(msg: string, data?: any): void;
     error(msg: string, data?: any, error?: Error): void;
     fatal(msg: string, data?: any, error?: Error): void;
+    httpMiddleware(req: Request, res: Response): void;
 }
 
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
     private logger!: pino.Logger;
-
     private traceId!: string;
+
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
+    private correlationIdLog: CorrelationIdLog;
 
-    constructor(private correlationIdLog: CorrelationIdLog) {}
+    constructor() {
+        this.correlationIdLog = new CorrelationIdLog();
+    }
 
     private setup() {
         const config: pino.LoggerOptions = {
@@ -92,6 +96,11 @@ export class Logger implements ILogger {
 
     public fatal(msg: string, data?: any, error?: Error) {
         this.log('fatal', msg, data, error);
+    }
+
+    public httpMiddleware(req: Request, res: Response): void {
+        this.correlationIdLog.set('correlation-id', uuidv4());
+        return middleware(req, res, this.logger);
     }
 
     get pinoLogger() {
