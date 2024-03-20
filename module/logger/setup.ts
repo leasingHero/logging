@@ -1,5 +1,5 @@
 import { Logger } from './logger';
-import { CorrelationIdLog } from './correlation';
+
 
 interface LoggingConfig {
     withRedaction(redactions: string[]): LoggingConfig;
@@ -10,11 +10,9 @@ interface LoggingConfig {
 
 export class InitLogging implements LoggingConfig {
     private logging: Logger;
-    private correlationIdLog: CorrelationIdLog
 
     constructor() {
-        this.correlationIdLog = new CorrelationIdLog();
-        this.logging = new Logger(this.correlationIdLog);
+        this.logging = new Logger();
     }
 
     public withRedaction(redactions: string[]): LoggingConfig {

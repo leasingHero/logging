@@ -76,7 +76,7 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
     return res;
 };
 
-export async function httpMiddleware(req: Request, res: Response, logger: any, uuid: string) {
+export function httpMiddleware(req: Request, res: Response, logger: any, uuid: string) {
     logger.info(getRequestLog(req, uuid));
     getResponseLog(res, logger, uuid);
 }

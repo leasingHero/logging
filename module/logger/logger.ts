@@ -18,12 +18,15 @@ interface ILogger {
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
     private logger!: pino.Logger;
+    private correlationIdLog: CorrelationIdLog;
 
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
 
-    constructor(private correlationIdLog: CorrelationIdLog) {}
+    constructor() {
+        this.correlationIdLog = new CorrelationIdLog();
+    }
 
     private setup() {
         const config: pino.LoggerOptions = {
@@ -50,9 +53,9 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
+    private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: await this.correlationIdLog.get('correlation-id'),
+            correlationId: this.correlationIdLog.get('correlation-id'),
             msg,
             data,
             error: error
@@ -61,8 +64,8 @@ export class Logger implements ILogger {
         });
     }
 
-    public async info(msg: string, data?: any) {
-        await this.log('info', msg, data);
+    public info(msg: string, data?: any) {
+        this.log('info', msg, data);
     }
 
     public debug(msg: string, data?: any) {
@@ -85,10 +88,10 @@ export class Logger implements ILogger {
         this.log('fatal', msg, data, error);
     }
 
-    public async httpMiddleware(req: Request, res: Response): Promise<void> {
+    public httpMiddleware(req: Request, res: Response): void {
         const uuid = uuidv4();
-        await this.correlationIdLog.set('correlation-id', uuid);
-        return await middleware(req, res, this.logger, uuid);
+        this.correlationIdLog.set('correlation-id', uuid);
+        return middleware(req, res, this.logger, uuid);
     }
 
     get pinoLogger() {

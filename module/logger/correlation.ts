@@ -4,11 +4,11 @@ import { Injectable, Scope } from '@nestjs/common';
 export class CorrelationIdLog {
     private readonly contextMap: Map<string, any> = new Map();
 
-    async set<T>(key: string, value: T): Promise<void> {
+    set<T>(key: string, value: T): void {
         this.contextMap.set(key, value);
     }
 
-    async get<T>(key: string): Promise<T | undefined> {
+    get<T>(key: string): T | undefined {
         return this.contextMap.get(key) as T;
     }
 }
