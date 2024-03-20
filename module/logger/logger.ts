@@ -53,9 +53,9 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
+    private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: this.correlationIdLog.get('correlation-id'),
+            correlationId: await this.correlationIdLog.get('correlation-id'),
             msg,
             data,
             error: error
