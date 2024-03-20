@@ -24,7 +24,7 @@ export class Logger implements ILogger {
     public format = '';
     public level = 'info';
 
-    constructor() {
+    constructor(private correlationIdLogOld: CorrelationIdLog) {
         this.correlationIdLog = new CorrelationIdLog();
     }
 
@@ -55,7 +55,7 @@ export class Logger implements ILogger {
 
     private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: await this.correlationIdLog.get('correlation-id'),
+            correlationId: await this.correlationIdLogOld.get('correlation-id'),
             msg,
             data,
             error: error
