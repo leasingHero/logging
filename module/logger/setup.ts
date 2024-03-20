@@ -13,6 +13,7 @@ export class InitLogging implements LoggingConfig {
     private correlationIdLog: CorrelationIdLog
 
     constructor() {
+        this.correlationIdLog = new CorrelationIdLog();
         this.logging = new Logger(this.correlationIdLog);
     }
 
