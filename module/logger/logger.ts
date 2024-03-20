@@ -64,8 +64,8 @@ export class Logger implements ILogger {
         });
     }
 
-    public async info(msg: string, data?: any) {
-        await this.log('info', msg, data);
+    public info(msg: string, data?: any) {
+        this.log('info', msg, data);
     }
 
     public debug(msg: string, data?: any) {
