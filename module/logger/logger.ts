@@ -18,15 +18,12 @@ interface ILogger {
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
     private logger!: pino.Logger;
-    private correlationIdLog: CorrelationIdLog;
 
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
 
-    constructor(private correlationIdLogOld: CorrelationIdLog) {
-        this.correlationIdLog = new CorrelationIdLog();
-    }
+    constructor(private correlationIdLog: CorrelationIdLog) {}
 
     private setup() {
         const config: pino.LoggerOptions = {
@@ -55,7 +52,7 @@ export class Logger implements ILogger {
 
     private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: await this.correlationIdLogOld.get('correlation-id'),
+            correlationId: await this.correlationIdLog.get('correlation-id'),
             msg,
             data,
             error: error
