@@ -88,10 +88,10 @@ export class Logger implements ILogger {
         this.log('fatal', msg, data, error);
     }
 
-    public httpMiddleware(req: Request, res: Response): void {
+    public async httpMiddleware(req: Request, res: Response): Promise<void> {
         const uuid = uuidv4();
-        this.correlationIdLog.set('correlation-id', uuid);
-        return middleware(req, res, this.logger, uuid);
+        await this.correlationIdLog.set('correlation-id', uuid);
+        return await middleware(req, res, this.logger, uuid);
     }
 
     get pinoLogger() {
