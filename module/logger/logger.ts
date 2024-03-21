@@ -4,6 +4,9 @@ import generateRedactions from './utils';
 import { CorrelationIdLog } from './correlation';
 import { httpMiddleware as middleware } from './middleware';
 import { Request, Response } from 'express';
+import * as cls from 'cls-hooked';
+
+const session = cls.createNamespace('logger session');
 
 interface ILogger {
     info(msg: string, data?: any): void;
@@ -55,7 +58,7 @@ export class Logger implements ILogger {
 
     private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: this.correlationIdLog.get('correlation-id'),
+            correlationId: session.get('correlation-id'),
             msg,
             data,
             error: error
@@ -90,7 +93,14 @@ export class Logger implements ILogger {
 
     public httpMiddleware(req: Request, res: Response): void {
         const uuid = uuidv4();
-        this.correlationIdLog.set('correlation-id', uuid);
+        // this.correlationIdLog.set('correlation-id', uuid);
+
+        // Run the middleware in the context of the new session
+        session.run(() => {
+            // Set the correlation-id in the session
+            session.set('correlation-id', uuid);
+        });
+
         return middleware(req, res, this.logger, uuid);
     }
 

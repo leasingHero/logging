@@ -25,6 +25,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cls-hooked": "^4.3.8",
     "@types/express": "^4.17.21",
     "@types/uuid": "^9.0.8",
     "prettier": "^3.2.5",
