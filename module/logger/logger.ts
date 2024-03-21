@@ -53,8 +53,13 @@ export class Logger implements ILogger {
     }
 
     private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
+        let correlationId: string;
+        if (storage.getStore()) {
+            correlationId = storage.getStore()['correlation-id'];
+        }
+
         this.logger[level]({
-            correlationId: storage.getStore()['correlation-id'],
+            correlationId,
             msg,
             data,
             error: error
