@@ -1,7 +1,6 @@
 import { pino } from 'pino';
 import { v4 as uuidv4 } from 'uuid';
 import generateRedactions from './utils';
-import { CorrelationIdLog } from './correlation';
 import { httpMiddleware as middleware } from './middleware';
 import { Request, Response } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
@@ -21,15 +20,12 @@ interface ILogger {
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
 export class Logger implements ILogger {
     private logger!: pino.Logger;
-    private correlationIdLog: CorrelationIdLog;
 
     public redactions: string[] = [];
     public format = '';
     public level = 'info';
 
-    constructor() {
-        this.correlationIdLog = new CorrelationIdLog();
-    }
+    constructor() {}
 
     private setup() {
         const config: pino.LoggerOptions = {
