@@ -4,9 +4,9 @@ import generateRedactions from './utils';
 import { CorrelationIdLog } from './correlation';
 import { httpMiddleware as middleware } from './middleware';
 import { Request, Response } from 'express';
-import * as cls from 'cls-hooked';
+import { AsyncLocalStorage } from 'async_hooks';
 
-const session = cls.createNamespace('logger session');
+const storage = new AsyncLocalStorage();
 
 interface ILogger {
     info(msg: string, data?: any): void;
@@ -56,9 +56,9 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
+    private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: await session.get('correlation-id'),
+            correlationId: storage.getStore()['correlation-id'],
             msg,
             data,
             error: error
@@ -67,8 +67,8 @@ export class Logger implements ILogger {
         });
     }
 
-    public async info(msg: string, data?: any) {
-        await this.log('info', msg, data);
+    public info(msg: string, data?: any) {
+        this.log('info', msg, data);
     }
 
     public debug(msg: string, data?: any) {
@@ -91,16 +91,14 @@ export class Logger implements ILogger {
         this.log('fatal', msg, data, error);
     }
 
-    public async httpMiddleware(req: Request, res: Response): Promise<void> {
+    public httpMiddleware(req: Request, res: Response): void {
         const uuid = uuidv4();
-        // this.correlationIdLog.set('correlation-id', uuid);
 
-        // Run the middleware in the context of the new session
-        session.run(async () => {
-            // Set the correlation-id in the session
-            await session.set('correlation-id', uuid);
-            return await middleware(req, res, this.logger, uuid);
+        storage.enterWith({
+            'correlation-id': uuid,
         });
+
+        middleware(req, res, this.logger, uuid);
     }
 
     get pinoLogger() {

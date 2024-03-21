@@ -7,7 +7,7 @@
   "module": "lib/module/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx tsc && node dist/index.js",
+    "start": "npx tsc && node lib/main/index.js",
     "example-log": "ts-node examples/log.ts",
     "format": "prettier --write \"**/*.ts\"",
     "build": "tsc",
@@ -18,7 +18,6 @@
   "dependencies": {
     "@nestjs/common": "^10.3.3",
     "@nestjs/core": "^10.3.3",
-    "cls-hooked": "^4.2.2",
     "correlation-id": "^5.0.3",
     "express": "^4.18.3",
     "pino": "^8.19.0",
