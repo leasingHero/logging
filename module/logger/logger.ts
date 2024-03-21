@@ -56,9 +56,9 @@ export class Logger implements ILogger {
         this.logger = pino(config);
     }
 
-    private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
+    private async log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         this.logger[level]({
-            correlationId: session.get('correlation-id'),
+            correlationId: await session.get('correlation-id'),
             msg,
             data,
             error: error
@@ -67,8 +67,8 @@ export class Logger implements ILogger {
         });
     }
 
-    public info(msg: string, data?: any) {
-        this.log('info', msg, data);
+    public async info(msg: string, data?: any) {
+        await this.log('info', msg, data);
     }
 
     public debug(msg: string, data?: any) {
@@ -91,15 +91,15 @@ export class Logger implements ILogger {
         this.log('fatal', msg, data, error);
     }
 
-    public httpMiddleware(req: Request, res: Response): void {
+    public async httpMiddleware(req: Request, res: Response): Promise<void> {
         const uuid = uuidv4();
         // this.correlationIdLog.set('correlation-id', uuid);
 
         // Run the middleware in the context of the new session
-        session.run(() => {
+        session.run(async () => {
             // Set the correlation-id in the session
-            session.set('correlation-id', uuid);
-            return middleware(req, res, this.logger, uuid);
+            await session.set('correlation-id', uuid);
+            return await middleware(req, res, this.logger, uuid);
         });
     }
 
