@@ -99,9 +99,8 @@ export class Logger implements ILogger {
         session.run(() => {
             // Set the correlation-id in the session
             session.set('correlation-id', uuid);
+            return middleware(req, res, this.logger, uuid);
         });
-
-        return middleware(req, res, this.logger, uuid);
     }
 
     get pinoLogger() {
