@@ -1,4 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { AsyncLocalStorage } from 'async_hooks';
+import { Logger } from './logger';
+
+const storage = new AsyncLocalStorage();
+
 
 const getRequestLog = (req: Request, uuid: string) => {
     return {
@@ -76,7 +82,23 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
     return res;
 };
 
-export function httpMiddleware(req: Request, res: Response, logger: any, uuid: string) {
+const middleware = (req: Request, res: Response, logger: any, uuid: string) {
     logger.info(getRequestLog(req, uuid));
     getResponseLog(res, logger, uuid);
+}
+
+interface HttpMiddleware {
+    httpMiddleware(req: Request, res: Response): void;
+}
+
+export class Middleware implements HttpMiddleware {
+    public httpMiddleware(req: Request, res: Response): void {
+        const uuid = uuidv4();
+    
+        storage.enterWith({
+            'correlation-id': uuid,
+        });
+    
+        middleware(req, res, Logger, uuid);
+    }
 }
