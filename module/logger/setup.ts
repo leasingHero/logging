@@ -45,10 +45,15 @@ interface LoggingMiddlewareConfig {
 export class InitMiddleware implements LoggingMiddlewareConfig {
     private middleware: Middleware;
 
+    constructor() {
+        this.middleware = new Middleware();
+    }
+
     public handleLogger(logger: Logger): this {
         this.middleware.logger = logger;
-        return this
+        return this;
     }
+
     public initialize(): Middleware {
         this.middleware.pinoLoggerMiddleware;
         return this.middleware;
