@@ -54,12 +54,15 @@ export class Logger implements ILogger {
 
     private log(level: LoggerLevel, msg: string, data?: any, error?: Error) {
         let traceId: string;
+        let timestamps = new Date();
         if (storage.getStore()) {
             traceId = storage.getStore()['correlation-id'];
+            timestamps = new Date();
         }
 
         this.logger[level]({
             traceId,
+            timestamps,
             msg,
             data,
             error: error
