@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { AsyncLocalStorage } from 'async_hooks';
 import { Logger } from './logger';
 
-const storage = new AsyncLocalStorage();
+
 interface IMiddleware {
     httpMiddleware(req: Request, res: Response, logger: any): void
 }
@@ -12,22 +11,17 @@ export class Middleware implements IMiddleware {
     public logger: Logger;
     public httpMiddleware(req: Request, res: Response):void {
         const uuid = uuidv4();
-
-        storage.enterWith({
-            'correlation-id': uuid,
-        });
-
-        this.logger.info('Request Payload:', this.getRequestLog(req, uuid));
-        this.getResponseLog(res, this.logger, uuid);
+        this.logger.setTraceId(uuid);
+        this.logger.info('Request Payload:', this.getRequestLog(req));
+        this.getResponseLog(res, this.logger);
     }
 
     get pinoLoggerMiddleware() {
         return this;
     }
 
-    private getRequestLog = (req: Request, uuid: string) => {
+    private getRequestLog = (req: Request) => {
         return {
-            traceId: uuid,
             request: {
                 method: req.method,
                 url: req.originalUrl,
@@ -39,7 +33,7 @@ export class Middleware implements IMiddleware {
         };
     };
     
-    private getResponseLog = (res: Response, logger: Logger, uuid: string) => {
+    private getResponseLog = (res: Response, logger: Logger) => {
         const rawResponse = res.write;
         const rawResponseEnd = res.end;
         const chunkBuffers = [];
@@ -82,7 +76,6 @@ export class Middleware implements IMiddleware {
             // Set custom header for response
             res.setHeader('origin', 'restjs-req-res-logging-repo');
             const responseLog = {
-                traceId: uuid,
                 response: {
                     statusCode: res.statusCode,
                     body: body || {},

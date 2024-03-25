@@ -52,7 +52,7 @@ export class Logger implements ILogger {
         let traceId: string;
         let timestamps = new Date();
         if (storage.getStore()) {
-            traceId = storage.getStore()['correlation-id'];
+            traceId = storage.getStore()['trace-id'];
         }
 
         this.logger[level]({
@@ -88,6 +88,12 @@ export class Logger implements ILogger {
 
     public fatal(msg: string, data?: any, error?: Error) {
         this.log('fatal', msg, data, error);
+    }
+
+    public setTraceId(uuid: string): void {
+        storage.enterWith({
+            'trace-id': uuid,
+        });
     }
 
     get pinoLogger() {
