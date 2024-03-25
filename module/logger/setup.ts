@@ -1,5 +1,5 @@
 import { Logger } from './logger';
-
+import { Middleware } from './middleware';
 
 interface LoggingConfig {
     withRedaction(redactions: string[]): LoggingConfig;
@@ -33,5 +33,29 @@ export class InitLogging implements LoggingConfig {
     public initialize(): Logger {
         this.logging.pinoLogger;
         return this.logging;
+    }
+
+}
+
+interface LoggingMiddlewareConfig {
+    handleLogger(logger: Logger): this;
+    initialize(): Middleware
+}
+
+export class InitMiddleware implements LoggingMiddlewareConfig {
+    private middleware: Middleware;
+
+    constructor() {
+        this.middleware = new Middleware();
+    }
+
+    public handleLogger(logger: Logger): this {
+        this.middleware.logger = logger;
+        return this;
+    }
+
+    public initialize(): Middleware {
+        this.middleware.pinoLoggerMiddleware;
+        return this.middleware;
     }
 }
