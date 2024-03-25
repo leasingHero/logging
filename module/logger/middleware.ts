@@ -82,15 +82,15 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
 };
 
 interface IMiddleware {
-    handleLogger(logger: Logger): void
+    // handleLogger(logger: Logger): void
     httpMiddleware(req: Request, res: Response, logger: any): void
 }
 
 export class Middleware implements IMiddleware {
     public logger: Logger;
-    public handleLogger(logger: Logger):void {
-        this.logger = logger
-    }
+    // public handleLogger(logger: Logger):void {
+    //     this.logger = logger
+    // }
 
     public httpMiddleware(req: Request, res: Response):void {
         const uuid = uuidv4();

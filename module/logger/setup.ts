@@ -42,12 +42,11 @@ interface LoggingMiddlewareConfig {
     initialize(): Middleware
 }
 
-
 export class InitMiddleware implements LoggingMiddlewareConfig {
     private middleware: Middleware;
 
     public handleLogger(logger: Logger): this {
-        this.middleware.handleLogger(logger)
+        this.middleware.logger = logger;
         return this
     }
     public initialize(): Middleware {
