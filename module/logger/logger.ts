@@ -1,8 +1,5 @@
 import { pino } from 'pino';
-import { v4 as uuidv4 } from 'uuid';
 import generateRedactions from './utils';
-// import { httpMiddleware as middleware } from './middleware';
-import { Request, Response } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
 
 const storage = new AsyncLocalStorage();
@@ -14,7 +11,6 @@ interface ILogger {
     warn(msg: string, data?: any): void;
     error(msg: string, data?: any, error?: Error): void;
     fatal(msg: string, data?: any, error?: Error): void;
-    // httpMiddleware(req: Request, res: Response): void;
 }
 
 type LoggerLevel = 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal';
@@ -94,16 +90,6 @@ export class Logger implements ILogger {
     public fatal(msg: string, data?: any, error?: Error) {
         this.log('fatal', msg, data, error);
     }
-
-    // public httpMiddleware(req: Request, res: Response): void {
-    //     const uuid = uuidv4();
-
-    //     storage.enterWith({
-    //         'correlation-id': uuid,
-    //     });
-
-    //     middleware(req, res, this.logger, uuid);
-    // }
 
     get pinoLogger() {
         this.setup();
