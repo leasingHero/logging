@@ -1,4 +1,9 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { AsyncLocalStorage } from 'async_hooks';
+import { Logger } from './logger';
+
+const storage = new AsyncLocalStorage();
 
 const getRequestLog = (req: Request, uuid: string) => {
     return {
@@ -76,7 +81,29 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
     return res;
 };
 
-export function httpMiddleware(req: Request, res: Response, logger: any, uuid: string) {
-    logger.info(getRequestLog(req, uuid));
-    getResponseLog(res, logger, uuid);
+interface IMiddleware {
+    handleLogger(logger: Logger): void
+    httpMiddleware(req: Request, res: Response, logger: any): void
+}
+
+export class Middleware implements IMiddleware {
+    public logger: Logger;
+    public handleLogger(logger: Logger):void {
+        this.logger = logger
+    }
+
+    public httpMiddleware(req: Request, res: Response):void {
+        const uuid = uuidv4();
+
+        storage.enterWith({
+            'correlation-id': uuid,
+        });
+
+        this.logger.info('p', getRequestLog(req, uuid));
+        // getResponseLog(res, this.logger, uuid);
+    }
+
+    get pinoLoggerMiddleware() {
+        return this;
+    }
 }
