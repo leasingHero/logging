@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 const getRequestLog = (req: Request, uuid: string) => {
     return {
-        correlationId: uuid,
+        traceId: uuid,
         request: {
             method: req.method,
             url: req.originalUrl,
@@ -57,7 +57,7 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
         // Set custom header for response
         res.setHeader('origin', 'restjs-req-res-logging-repo');
         const responseLog = {
-            correlationId: uuid,
+            traceId: uuid,
             response: {
                 statusCode: res.statusCode,
                 body: body || {},
