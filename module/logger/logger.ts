@@ -102,7 +102,7 @@ export class Logger implements ILogger {
             'correlation-id': uuid,
         });
 
-        middleware(req, res, this.logger, uuid);
+        middleware(req, res, this.pinoLogger, uuid);
     }
 
     get pinoLogger() {
