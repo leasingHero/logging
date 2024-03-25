@@ -82,7 +82,7 @@ const getResponseLog = (res: Response, logger: any, uuid: string) => {
     return res;
 };
 
-const middleware = (req: Request, res: Response, logger: any, uuid: string) {
+const middleware = (req: Request, res: Response, logger: any, uuid: string) => {
     logger.info(getRequestLog(req, uuid));
     getResponseLog(res, logger, uuid);
 }
