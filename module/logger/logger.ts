@@ -1,7 +1,6 @@
 import { pino } from 'pino';
 import { v4 as uuidv4 } from 'uuid';
 import generateRedactions from './utils';
-import { httpMiddleware as middleware } from './middleware';
 import { Request, Response } from 'express';
 import { AsyncLocalStorage } from 'async_hooks';
 
@@ -57,7 +56,6 @@ export class Logger implements ILogger {
         let timestamps = new Date();
         if (storage.getStore()) {
             traceId = storage.getStore()['correlation-id'];
-            timestamps = new Date();
         }
 
         this.logger[level]({
@@ -102,8 +100,79 @@ export class Logger implements ILogger {
             'correlation-id': uuid,
         });
 
-        middleware(req, res, this.logger, uuid);
+        this.getRequestLog(req);
+        this.getResponseLog(res);
     }
+
+    private getRequestLog(req: Request): any {
+        this.info('Request Payload:', {
+            request: {
+                method: req.method,
+                url: req.originalUrl,
+                query: req.query,
+                body: req.body,
+                headers: req.headers,
+                ip: req.ip,
+            },
+        });
+    };
+    
+    private getResponseLog(res: Response): any {
+        const rawResponse = res.write;
+        const rawResponseEnd = res.end;
+        const chunkBuffers = [];
+    
+        res.write = (...chunks) => {
+            const resArgs = [];
+            for (let i = 0; i < chunks.length; i++) {
+                resArgs[i] = chunks[i];
+                if (!resArgs[i]) {
+                    res.once('drain', res.write);
+                    --i;
+                }
+            }
+    
+            if (resArgs[0]) {
+                chunkBuffers.push(Buffer.from(resArgs[0]));
+            }
+    
+            return rawResponse.apply(res, resArgs);
+        };
+    
+        res.end = (...chunk) => {
+            const resArgs = [];
+            for (let i = 0; i < chunk.length; i++) {
+                resArgs[i] = chunk[i];
+            }
+    
+            if (resArgs[0]) {
+                chunkBuffers.push(Buffer.from(resArgs[0]));
+            }
+    
+            let body = Buffer.concat(chunkBuffers).toString('utf8');
+    
+            try {
+                body = JSON?.parse(body);
+            } catch (error) {
+                // logger.warn(null, 'Warning: Response body is string!');
+            }
+    
+            res.setHeader('origin', 'restjs-req-res-logging-repo');
+            const responseLog = {
+                response: {
+                    statusCode: res.statusCode,
+                    body: body || {},
+                    headers: res.getHeaders(),
+                },
+            };
+    
+            this.info('Response Payload:', responseLog);
+            rawResponseEnd.apply(res, resArgs);
+            return responseLog as unknown as Response;
+        };
+    
+        return res;
+    };
 
     get pinoLogger() {
         this.setup();
